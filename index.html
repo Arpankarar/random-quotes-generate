@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="./public/css/style.css">
+    <link rel="shortcut icon" href="./public/img/logo.jpg" type="image/jpg">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" integrity="sha512-iBBXm8fW90+nuLcSKlbmrPcLa0OT92xO1BIsZ+ywDWZCvqsWgccV3gFoRBv0z+8dLJgyAHIhR35VZc2oM/gI1w==" crossorigin="anonymous" />
+    <title>Quotes</title>
+</head>
+<body>
+
+    <div class="container">
+            <div class="copyBox">
+                <button id="copyBtn"></button>
+            </div>
+            <div class="quoteSignLeft">	
+                <i class="fas fa-quote-left"></i>
+            </div>
+            <div class="quote"></div>
+            <div class="quoteSignRight">	
+                <i class="fas fa-quote-right"></i>
+            </div>
+            <div class="author"></div>
+            <div class="newQuote">
+                <button id="nextQuote"></button>
+            </div>
+    </div>
+
+    <script>
+        // assigning variables
+const copyBtn = document.querySelector("#copyBtn");
+const quoteBox = document.querySelector(".quote");
+const authorBox = document.querySelector(".author");
+const nextQuoteBtn = document.querySelector("#nextQuote");
+
+
+// text content
+copyBtn.innerHTML = "<i class='fas fa-copy'></i> Copy Quote";
+nextQuoteBtn.textContent = "New Quote";
+quoteBox.textContent = "It always seems impossible until it's done...";
+authorBox.textContent = "by  Nelson Mandela";
+
+
+// inner height of devices
+const deviceheight = () => {
+    const height = window.innerHeight;
+    if(height < 500){
+        quoteBox.innerHTML = "Please rotate your device then click on New Quote Button.";
+        authorBox.innerHTML = "Please rotate your deveice then click on New Quote Button.";
+        nextQuoteBtn.style.display = "none";
+    }else{
+        nextQuoteBtn.style.display = "block";
+    }
+}
+
+
+// generating quotes
+const generateQuote = async () => {
+    const api = "https://type.fit/api/quotes";
+    quoteBox.textContent = "Loading...";
+    authorBox.textContent = "Loading...";
+    const randomNum = Math.floor(Math.random() * 1643);// 1643 numbers of quotes...
+
+    try {
+        const data = await fetch(api);
+        const jsonData = await data.json();
+        const quote = jsonData[randomNum].text;
+        const author = jsonData[randomNum].author;
+        author == null 
+                ? authorBox.innerHTML = "by unKnown" 
+                : authorBox.innerHTML  = `by ${author}`;
+        quoteBox.innerHTML = quote;
+    } catch (error) {
+        console.log(error);
+        quoteBox.textContent = "Check Your Internet Connection.";
+        authorBox.textContent  = "Check Your Internet Connection.";
+    }
+}
+
+// copying quotes
+const copyQuote = () => {
+    const copiedQuote = quoteBox.innerHTML;
+    const copiedAuthor = authorBox.innerHTML;
+    
+    navigator.clipboard.writeText(`${copiedQuote} ${copiedAuthor}`);
+    copyBtn.innerHTML ="&#10003;  Copied";
+    quoteBox.style.color = "#000";
+    authorBox.style.color = '#000';
+    setTimeout(() => {
+        copyBtn.innerHTML = "<i class='fas fa-copy'></i> Copy Quote";
+        quoteBox.style.color = "#fff";
+        authorBox.style.color = "#fff";
+    }, 1000);
+}
+
+
+// calling the generate quote and copy quote functions
+nextQuoteBtn.addEventListener("click", generateQuote);
+copyBtn.addEventListener("click", copyQuote);
+
+setInterval(() => {
+    deviceheight();
+}, 800);
+
+
+    </script>
+</body>
+</html>
